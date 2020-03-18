@@ -1,0 +1,25 @@
+version: '3.7'
+
+services:
+  db:
+    image: mariadb-toku
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: f9EL-n\**~h{HmKN!d@i
+      MYSQL_DATABASE: gofer
+      MYSQL_USER: goferfull
+      MYSQL_PASSWORD: goferfullpass
+    networks:
+      - gofernet
+    command: --plugin-load=ha_tokudb --default-storage-engine=TokuDB
+
+  gofer:
+    image: gofer3
+    restart: always
+    ports:
+      - 5432:5432
+    networks:
+      - gofernet
+
+network:
+  gofernet:

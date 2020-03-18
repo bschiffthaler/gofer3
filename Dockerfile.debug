@@ -1,0 +1,34 @@
+FROM fedora
+
+#########
+### Install build deps (large)
+#########
+RUN dnf install -y gcc gdb cmake boost-devel gcc-c++ openssl-devel \
+  cpprest-devel mariadb-devel mariadb-connector-c-devel make && \
+  dnf debuginfo-install -y mariadb-connector-c && \
+  dnf clean all
+
+#########
+### Clone repo
+#########
+WORKDIR /build
+COPY . /build/gofer3
+WORKDIR /build/gofer3/build
+
+#########
+### Build Gopher3 source
+#########
+RUN rm -rf * && \
+  cmake -DCMAKE_BUILD_TYPE=Debug .. && \
+  make
+
+WORKDIR / 
+RUN cp /build/gofer3/build/gofer3 /usr/local/bin/gofer3
+RUN cp /build/gofer3/build/updateDB /usr/local/bin/updateDB
+COPY script/entrypoint.sh /bin/entrypoint.sh
+
+#########
+### PORT and CMD
+#########
+EXPOSE 5432
+ENTRYPOINT ["/bin/entrypoint.sh"]
